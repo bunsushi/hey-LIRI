@@ -24,20 +24,40 @@ switch (command) {
         });
         break;
     case "spotify-this-song":
-        console.log("Sing it out loud:");
-        spotify.search({ type: 'track', query: media }, function (err, data) {
-            if (err) {
-                return console.log('Error occurred: ' + err);
-            }
-            var info = data.tracks.items;
-            console.log(
-                "\nArtist: " + info[0].artists[0].name +
-                "\nSong: " + info[0].name + 
-                "\nAlbum: " + info[0].album.name + 
-                // ATTN: Some songs preview url returns null
-                "\nPreview: " + info[0].preview_url
-            )
-        });
+        if (!media) {
+            spotify.search({ type: 'track', query: "The Sign" }, function (err, data) {
+                if (err) {
+                    return console.log('Error occurred: ' + err);
+                }
+                var info = data.tracks.items;
+                for (var i = 0; i < info.length; i++) {
+                    if (info[i].album.name === "The Sign (US Album) [Remastered]" && info[i].name === "The Sign") {
+                        console.log(
+                            "\nArtist: " + info[i].artists[0].name +
+                            "\nSong: " + info[i].name +
+                            "\nAlbum: " + info[i].album.name +
+                            // ATTN: Some songs preview url returns null
+                            "\nPreview: " + info[i].preview_url
+                        );
+                    }
+                }
+            });
+        }
+        else if (media) {
+            spotify.search({ type: 'track', query: media }, function (err, data) {
+                if (err) {
+                    return console.log('Error occurred: ' + err);
+                }
+                var info = data.tracks.items;
+                console.log(
+                    "\nArtist: " + info[0].artists[0].name +
+                    "\nSong: " + info[0].name +
+                    "\nAlbum: " + info[0].album.name +
+                    // ATTN: Some songs preview url returns null
+                    "\nPreview: " + info[0].preview_url
+                )
+            });
+        }
         break;
     case "movie-this":
         console.log("Fetching that movie:");
