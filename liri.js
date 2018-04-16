@@ -3,7 +3,9 @@ var keys = require('./keys.js');
 var Spotify = require('node-spotify-api');
 var Twitter = require('twitter');
 var moment = require('moment');
-var request = require("request");
+var request = require('request');
+var fs = require('fs');
+var exec = require('child_process').exec;
 
 var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
@@ -27,6 +29,7 @@ switch (command) {
     case "spotify-this-song":
         console.log("Searching for that song...");
         if (!media) {
+            console.log("\nOops, you forgot to search for a song. May I recommend...");
             spotify.search({ type: 'track', query: "The Sign" }, function (err, data) {
                 if (err) {
                     return console.log('Error occurred: ' + err);
@@ -63,24 +66,62 @@ switch (command) {
         break;
     case "movie-this":
         console.log("Fetching that movie...");
-        var movieTitle = media.replace(" ", "+");
-        var queryUrl = "http://www.omdbapi.com/?t=" + movieTitle + "&y=&plot=short&apikey=trilogy";
-        request(queryUrl, function (error, response, body) {
-            // If the request is successful
-            if (!error && response.statusCode === 200) {
-                console.log(
-                    "\nTitle: " + JSON.parse(body).Title +
-                    "\nRelease Year: " + JSON.parse(body).Year +
-                    "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value + 
-                    "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value + 
-                    "\nCountry: " + JSON.parse(body).Country + 
-                    "\nStarring: " + JSON.parse(body).Actors
-                );
-            }
-        });
+
+        if (!media) {
+            console.log("\nOops, you forgot to search for a movie. May I recommend...");
+            var movieTitle = "Mr+Nobody";
+            var queryUrl = "http://www.omdbapi.com/?t=" + movieTitle + "&y=&plot=short&apikey=trilogy";
+            request(queryUrl, function (error, response, body) {
+                // If the request is successful
+                if (!error && response.statusCode === 200) {
+                    console.log(
+                        "\nTitle: " + JSON.parse(body).Title +
+                        "\nRelease Year: " + JSON.parse(body).Year +
+                        "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value +
+                        "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value +
+                        "\nCountry: " + JSON.parse(body).Country +
+                        "\nStarring: " + JSON.parse(body).Actors
+                    );
+                }
+            });
+        }
+        else if (media) {
+            var movieTitle = media.replace(" ", "+");
+            var queryUrl = "http://www.omdbapi.com/?t=" + movieTitle + "&y=&plot=short&apikey=trilogy";
+            request(queryUrl, function (error, response, body) {
+                // If the request is successful
+                if (!error && response.statusCode === 200) {
+                    console.log(
+                        "\nTitle: " + JSON.parse(body).Title +
+                        "\nRelease Year: " + JSON.parse(body).Year +
+                        "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value +
+                        "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value +
+                        "\nCountry: " + JSON.parse(body).Country +
+                        "\nStarring: " + JSON.parse(body).Actors
+                    );
+                }
+            });
+        }
         break;
     case "do-what-it-says":
         console.log("Just do it!");
+        fs.readFile("random.txt", "utf8", function (error, data) {
+            if (error) {
+                return console.log(error);
+            }
+            var dataArr = data.split(",");
+
+            var command = dataArr[0];
+            var media = dataArr[1];
+
+            var cmd = 'node liri.js ' + command + media;
+            console.log(cmd);
+
+            exec(cmd, function (error, stdout, stderr) {
+                // command output is in stdout
+                console.log(stdout);
+            });
+        });
         break;
     default:
         console.log("I'm sorry Dave, I'm afraid I can't do that.");
