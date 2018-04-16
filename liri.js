@@ -16,8 +16,9 @@ switch (command) {
         client.get('statuses/user_timeline', params, function (error, tweets, response) {
             if (!error) {
                 for (var i = 0; i < tweets.length; i++) {
-                    console.log(tweets[i].text);
-                    console.log(moment(tweets[i].created_at).format('LLLL'));
+                    console.log(i + 1 + ") " + tweets[i].text);
+                    // FYI deprecation error listed at first tweet due to format
+                    console.log(moment(tweets[i].created_at, "ddd MMM DD HH:mm:ss Z YYYY").format('LLLL'));
                 }
             }
         });
