@@ -3,6 +3,7 @@ var keys = require('./keys.js');
 var Spotify = require('node-spotify-api');
 var Twitter = require('twitter');
 var moment = require('moment');
+var request = require("request");
 
 var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
@@ -17,13 +18,14 @@ switch (command) {
         client.get('statuses/user_timeline', params, function (error, tweets, response) {
             if (!error) {
                 for (var i = 0; i < tweets.length; i++) {
-                    console.log(i + 1 + ") " + tweets[i].text);
+                    console.log("\n" + (i + 1) + ") " + tweets[i].text);
                     console.log(moment(tweets[i].created_at, "ddd MMM DD HH:mm:ss Z YYYY").format('LLLL'));
                 }
             }
         });
         break;
     case "spotify-this-song":
+        console.log("Searching for that song...");
         if (!media) {
             spotify.search({ type: 'track', query: "The Sign" }, function (err, data) {
                 if (err) {
@@ -60,7 +62,22 @@ switch (command) {
         }
         break;
     case "movie-this":
-        console.log("Fetching that movie:");
+        console.log("Fetching that movie...");
+        var movieTitle = media.replace(" ", "+");
+        var queryUrl = "http://www.omdbapi.com/?t=" + movieTitle + "&y=&plot=short&apikey=trilogy";
+        request(queryUrl, function (error, response, body) {
+            // If the request is successful
+            if (!error && response.statusCode === 200) {
+                console.log(
+                    "\nTitle: " + JSON.parse(body).Title +
+                    "\nRelease Year: " + JSON.parse(body).Year +
+                    "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value + 
+                    "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value + 
+                    "\nCountry: " + JSON.parse(body).Country + 
+                    "\nStarring: " + JSON.parse(body).Actors
+                );
+            }
+        });
         break;
     case "do-what-it-says":
         console.log("Just do it!");

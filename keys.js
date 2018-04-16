@@ -1,4 +1,4 @@
-console.log('This page is linked');
+// console.log('This page is linked');
 
 exports.twitter = {
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
