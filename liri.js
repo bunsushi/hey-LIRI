@@ -23,11 +23,11 @@ switch (command) {
     case "movie-this":
         movieThis();
         break;
-    case "do-what-it-says":
+    case "surprise-me":
         justDoIt();
         break;
     default:
-        console.log("I'm sorry Dave, I'm afraid I can't do that.");
+        getInstructions();
 }
 
 function myTweets(username) {
@@ -39,7 +39,7 @@ function myTweets(username) {
             for (var i = 0; i < tweets.length; i++) {
                 var tweetsText =
                     "\n" + (i + 1) + ") " + tweets[i].text +
-                    "\n" + moment(tweets[i].created_at, "ddd MMM DD HH:mm:ss Z YYYY").format('LLLL');
+                    "\n" + moment(tweets[i].created_at, "ddd MMM DD HH:mm:ss Z YYYY").format('LLLL') + "\n";
                 console.log(tweetsText);
 
                 fs.appendFile("log.txt", tweetsText, function (err, data) {
@@ -68,7 +68,7 @@ function spotifyThisSong() {
                         "\nSong: " + info[i].name +
                         "\nAlbum: " + info[i].album.name +
                         // ATTN: Some songs preview url returns null
-                        "\nPreview: " + info[i].preview_url
+                        "\nPreview: " + info[i].preview_url + "\n"
                     console.log(theSign);
 
                     dateStamp();
@@ -93,7 +93,7 @@ function spotifyThisSong() {
                 "\nSong: " + info[0].name +
                 "\nAlbum: " + info[0].album.name +
                 // ATTN: Some songs preview url returns null
-                "\nPreview: " + info[0].preview_url
+                "\nPreview: " + info[0].preview_url + "\n"
 
             console.log(songData);
 
@@ -122,7 +122,8 @@ function movieThis() {
                     "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value +
                     "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value +
                     "\nCountry: " + JSON.parse(body).Country +
-                    "\nStarring: " + JSON.parse(body).Actors
+                    "\nStarring: " + JSON.parse(body).Actors +
+                    "\nPlot: " + JSON.parse(body).Plot + "\n"
                 console.log(mrNobody);
             }
             dateStamp();
@@ -145,7 +146,8 @@ function movieThis() {
                     "\nIMDB Rating: " + JSON.parse(body).Ratings[0].Value +
                     "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value +
                     "\nCountry: " + JSON.parse(body).Country +
-                    "\nStarring: " + JSON.parse(body).Actors
+                    "\nStarring: " + JSON.parse(body).Actors + 
+                    "\nPlot: " + JSON.parse(body).Plot + "\n"
                 console.log(movieData);
             };
             dateStamp();
@@ -192,6 +194,23 @@ function dateStamp() {
     fs.appendFile("log.txt", lineBreak, function (err, data) {
         if (err) {
             return console.log(err);
-        }
+        };
     });
-}
+};
+
+function getInstructions() {
+    console.log(
+        "\nI'm sorry Dave, I'm afraid I can't do that." +
+        "\n" +
+        "\nSome things you can ask me:" +
+        "\n" +
+        "\n$ node liri.js my-tweets" +
+        "\nDisplays your 20 most recent tweets." +
+        "\n\n$ node liri.js spotify-this-song '<song name>'" +
+        "\nReturns information about a specific song from Spotify." +
+        "\n\n$ node liri.js movie-this '<movie name>'" +
+        "\nReturns information about a specific movie from OMDb." +
+        "\n\n$ node liri.js surprise-me" +
+        "\nExecutes a random command from random.txt.\n"
+    );
+};
